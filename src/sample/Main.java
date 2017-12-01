@@ -1,45 +1,103 @@
 package sample;
 
 import javafx.application.Application;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.StackPane;
+import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
+import java.awt.*;
+
 public class Main extends Application  {
-    Button button;
-    GridPane grid;
 
     public static void main(String[] args) {
         launch(args);
     }
 
     @Override
-    public void start(Stage primaryStage) throws Exception{
-        //Parent root = FXMLLoader.load(getClass().getResource("sample.fxml"));
-
+    public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Hospital Management Portal");
 
-        button = new Button();
-        button.setText("Click me");
-        button.setOnAction(e -> HospitalDBMediator.test());
+        Font labelFont = new Font("Arial", 15);
 
-        grid = new GridPane();
+        // Initialize controls
+        GridPane grid = new GridPane();
         grid.setAlignment(Pos.TOP_CENTER);
         grid.setHgap(10);
-        grid.setVgap(10);
+        grid.setVgap(20);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
+        Button btnReport = new Button();
+        btnReport.setText("Generate report");
+        btnReport.setOnAction(e -> HospitalDBMediator.test());
 
-        grid.add(button, 0, 0);
-        grid.add(new Button(), 0, 3);
+        Button btnInsert = new Button();
+        btnInsert.setText("Insert patient");
+
+        TextField txtReport = new TextField();
+        txtReport.setPromptText("Patient name");
+
+        TextField txtName = new TextField();
+        txtName.setPromptText("Name");
+
+        TextField txtPID = new TextField();
+        txtPID.setPromptText("Patient ID (ex. 1234)");
+
+        TextField txtDiagnosis = new TextField();
+        txtDiagnosis.setPromptText("Hypertension, diabetes, etc");
+
+        TextField txtPrescription = new TextField();
+        txtPrescription.setPromptText("Synthroid, Crestor, etc");
+
+        ChoiceBox choiceDoctor = new ChoiceBox();
+
+        ChoiceBox choiceRoom = new ChoiceBox();
+
+        Label lPID = new Label("Patient ID");
+        lPID.setFont(labelFont);
+
+        Label lPatientName = new Label("Patient name");
+        lPatientName.setFont(labelFont);
+
+        Label lDiagnosis = new Label("Diagnosis");
+        lDiagnosis.setFont(labelFont);
+
+        Label lPrescription = new Label("Prescription");
+        lPrescription.setFont(labelFont);
+
+        Label lDoctor = new Label("Doctor");
+        lDoctor.setFont(labelFont);
+
+        Label lRoom = new Label("Room");
+        lRoom.setFont(labelFont);
+
+        // Add controls to grid
+        grid.add(btnReport, 0, 0);
+        grid.add(btnInsert, 0, 9);
+
+
+        grid.add(lPID, 0, 3);
+        grid.add(lPatientName, 0, 4);
+        grid.add(lDiagnosis, 0, 5);
+        grid.add(lPrescription, 0, 6);
+        grid.add(lDoctor, 0, 7);
+        grid.add(lRoom, 0, 8);
+
+        grid.add(txtReport, 1, 0);
+        grid.add(txtPID, 1, 3);
+        grid.add(txtName, 1, 4);
+        grid.add(txtDiagnosis, 1, 5);
+        grid.add(txtPrescription, 1, 6);
+        grid.add(choiceDoctor, 1, 7);
+        grid.add(choiceRoom, 1, 8);
+
+
 
         Scene scene = new Scene(grid, 500, 500);
 
