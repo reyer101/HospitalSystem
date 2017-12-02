@@ -1,18 +1,20 @@
 package sample;
 
 import javafx.application.Application;
+import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.*;
 import javafx.scene.control.Button;
-import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
 
-import java.awt.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Main extends Application  {
 
@@ -23,6 +25,8 @@ public class Main extends Application  {
     @Override
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Hospital Management Portal");
+
+        HashMap<String, Integer> mDoctors = HospitalDBMediator.getDoctors();
 
         Font labelFont = new Font("Arial", 15);
 
@@ -35,7 +39,6 @@ public class Main extends Application  {
 
         Button btnReport = new Button();
         btnReport.setText("Generate report");
-        btnReport.setOnAction(e -> HospitalDBMediator.test());
 
         Button btnInsert = new Button();
         btnInsert.setText("Insert patient");
@@ -56,8 +59,14 @@ public class Main extends Application  {
         txtPrescription.setPromptText("Synthroid, Crestor, etc");
 
         ChoiceBox choiceDoctor = new ChoiceBox();
+        choiceDoctor.setItems(FXCollections.observableArrayList(
+                new ArrayList<String>(mDoctors.keySet())
+        ));
 
         ChoiceBox choiceRoom = new ChoiceBox();
+        choiceRoom.setItems(FXCollections.observableArrayList(
+                HospitalDBMediator.getRooms())
+        );
 
         Label lPID = new Label("Patient ID");
         lPID.setFont(labelFont);
@@ -81,7 +90,6 @@ public class Main extends Application  {
         grid.add(btnReport, 0, 0);
         grid.add(btnInsert, 0, 9);
 
-
         grid.add(lPID, 0, 3);
         grid.add(lPatientName, 0, 4);
         grid.add(lDiagnosis, 0, 5);
@@ -96,8 +104,6 @@ public class Main extends Application  {
         grid.add(txtPrescription, 1, 6);
         grid.add(choiceDoctor, 1, 7);
         grid.add(choiceRoom, 1, 8);
-
-
 
         Scene scene = new Scene(grid, 500, 500);
 
