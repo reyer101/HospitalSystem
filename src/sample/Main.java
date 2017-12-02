@@ -43,9 +43,6 @@ public class Main extends Application  {
         Button btnInsert = new Button();
         btnInsert.setText("Insert patient");
 
-        TextField txtReport = new TextField();
-        txtReport.setPromptText("Patient name");
-
         TextField txtName = new TextField();
         txtName.setPromptText("Name");
 
@@ -57,6 +54,11 @@ public class Main extends Application  {
 
         TextField txtPrescription = new TextField();
         txtPrescription.setPromptText("Synthroid, Crestor, etc");
+
+        ChoiceBox choicePatient = new ChoiceBox();
+        choicePatient.setItems(FXCollections.observableArrayList(
+                HospitalDBMediator.getPatients()
+        ));
 
         ChoiceBox choiceDoctor = new ChoiceBox();
         choiceDoctor.setItems(FXCollections.observableArrayList(
@@ -97,11 +99,12 @@ public class Main extends Application  {
         grid.add(lDoctor, 0, 7);
         grid.add(lRoom, 0, 8);
 
-        grid.add(txtReport, 1, 0);
         grid.add(txtPID, 1, 3);
         grid.add(txtName, 1, 4);
         grid.add(txtDiagnosis, 1, 5);
         grid.add(txtPrescription, 1, 6);
+
+        grid.add(choicePatient, 1, 0);
         grid.add(choiceDoctor, 1, 7);
         grid.add(choiceRoom, 1, 8);
 
