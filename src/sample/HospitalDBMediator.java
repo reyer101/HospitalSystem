@@ -11,10 +11,11 @@ public class HospitalDBMediator {
     private static final String QUERY_DOCTORS = "SELECT * FROM Doctors;";
     private static final String QUERY_ROOMS = "SELECT * FROM Rooms;";
     private static final String QUERY_PATIENTS = "SELECT * FROM Patients;";
+    private static final String QUERY_PATIENT = "SELECT * FROM PATIENTS WHERE pid = ?";
     private static final String INSERT_PATIENTS = "insertPatients(?, ?, ?, ?, ?, ?)";
 
-    public static ArrayList<String> getPatients() {
-        ArrayList<String> retval = new ArrayList<>();
+    public static HashMap<String, Integer> getPatients() {
+        HashMap<String, Integer> retval = new HashMap<>();
         Connection conn = null;
 
         try {
@@ -28,7 +29,9 @@ public class HospitalDBMediator {
 
             while(result.next())
             {
-                retval.add(result.getString(2));
+                retval.put(String.format(result.getString(
+                        2) + " (%d)", result.getInt(1)),
+                        result.getInt(1));
             }
 
         } catch (SQLException ex) {
@@ -129,5 +132,38 @@ public class HospitalDBMediator {
             System.out.println("SQLState: " + ex.getSQLState());
             System.out.println("VendorError: " + ex.getErrorCode());
         }
+    }
+
+    public static HashMap<String, String> getPatientHistory(int pid) {
+        HashMap<String, String> retval = new HashMap<>();
+        Connection conn = null;
+
+        try {
+            conn =  DriverManager.getConnection(CONNECTION_URL);
+            conn.setAutoCommit(false);
+
+            PreparedStatement preparedStatement = conn.prepareStatement(QUERY_PATIENT);
+            preparedStatement.setInt(1, pid);
+            ResultSet result = preparedStatement.executeQuery();
+
+            conn.commit();
+
+            while(result.next())
+            {
+                retval.put("pid", Integer.toString(result.getInt(1)));
+                retval.put("name", result.getString(2));
+                retval.put("diagnosis", Integer.toString(result.getInt(3)));
+                retval.put("prescription", Integer.toString(result.getInt(4)));
+                retval.put("doctor", Integer.toString(result.getInt(5)));
+                retval.put("room", Integer.toString(result.getInt(6)));
+            }
+
+        } catch (SQLException ex) {
+            System.out.println("SQLException: " + ex.getMessage());
+            System.out.println("SQLState: " + ex.getSQLState());
+            System.out.println("VendorError: " + ex.getErrorCode());
+        }
+
+        return retval;
     }
 }

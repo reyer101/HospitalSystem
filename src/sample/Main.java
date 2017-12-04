@@ -24,7 +24,7 @@ public class Main extends Application  {
     Button btnReport, btnInsert;
     Label lPID, lPatientName, lDiagnosis, lPrescription, lDoctor, lRoom;
 
-    HashMap<String, Integer> mDoctors;
+    HashMap<String, Integer> mDoctors, mPatients;
 
     public static void main(String[] args) {
         launch(args);
@@ -34,6 +34,7 @@ public class Main extends Application  {
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Hospital Management Portal");
 
+        mPatients = HospitalDBMediator.getPatients();
         mDoctors = HospitalDBMediator.getDoctors();
 
         Font labelFont = new Font("Arial", 15);
@@ -59,7 +60,7 @@ public class Main extends Application  {
 
         choicePatient = new ChoiceBox();
         choicePatient.setItems(FXCollections.observableArrayList(
-                HospitalDBMediator.getPatients()
+                new ArrayList<String>(mPatients.keySet())
         ));
 
         choiceDoctor = new ChoiceBox();
@@ -92,15 +93,22 @@ public class Main extends Application  {
 
         btnReport = new Button();
         btnReport.setText("Generate report");
+        btnReport.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                String patient = Utils.getStringSelection(choicePatient);
+                if(!patient.isEmpty()) {
+                    Utils.generatePatientReport(mPatients.get(patient));
+                } else {
+                    // TODO: Do something when generate report clicked and no patient
+                    System.out.println("No patient selected");
+                }
+            }
+        });
 
         btnInsert = new Button();
         btnInsert.setText("Insert patient");
-        btnInsert.setOnAction(new EventHandler<ActionEvent>() {
-            @Override
-            public void handle(ActionEvent event) {
-                insertPatient();
-            }
-        });
+        btnInsert.setOnAction(e -> insertPatient());
 
         // Add controls to grid
         grid.add(btnReport, 0, 0);

@@ -2,8 +2,14 @@ package sample;
 
 import javafx.scene.control.ChoiceBox;
 
-public class Utils {
+import java.io.BufferedWriter;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.nio.Buffer;
+import java.util.HashMap;
+import java.util.UUID;
 
+public class Utils {
     public static String getStringSelection(ChoiceBox choiceBox) {
         String retval = "";
         Object obj = choiceBox.getSelectionModel().getSelectedItem();
@@ -25,5 +31,31 @@ public class Utils {
             retval = split[0] + " " + split[1];
         }
         return retval;
+    }
+
+    public static void generatePatientReport(int pid) {
+        BufferedWriter writer;
+        HashMap<String, String> patientHistory
+                = HospitalDBMediator.getPatientHistory(pid);
+
+        String filename = "Report_" + patientHistory.get(
+                "name").replace(" ", "_") + "_" +
+                patientHistory.get("pid") + ".csv";
+
+        String patientReport = "Name: %s, PID: %s, Diagnosis: %s," +
+                "Prescription: %s, Doctor ID: %s, Room: %s";
+
+        try {
+            writer = new BufferedWriter(new FileWriter(filename));
+            writer.write(String.format(patientReport, patientHistory.get("name"),
+                    patientHistory.get("pid"), patientHistory.get("diagnosis"),
+                    patientHistory.get("prescription"), patientHistory.get("doctor"),
+                    patientHistory.get("room"))
+            );
+
+            writer.close();
+        } catch(IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 }
