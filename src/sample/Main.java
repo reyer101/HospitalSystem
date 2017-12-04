@@ -2,6 +2,8 @@ package sample;
 
 import javafx.application.Application;
 import javafx.collections.FXCollections;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -17,6 +19,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Main extends Application  {
+    ChoiceBox choiceDoctor, choicePatient, choiceRoom;
+    TextField txtName, txtPID, txtDiagnosis, txtPrescription;
+    Button btnReport, btnInsert;
+    Label lPID, lPatientName, lDiagnosis, lPrescription, lDoctor, lRoom;
+
+    HashMap<String, Integer> mDoctors;
 
     public static void main(String[] args) {
         launch(args);
@@ -26,7 +34,7 @@ public class Main extends Application  {
     public void start(Stage primaryStage) throws Exception {
         primaryStage.setTitle("Hospital Management Portal");
 
-        HashMap<String, Integer> mDoctors = HospitalDBMediator.getDoctors();
+        mDoctors = HospitalDBMediator.getDoctors();
 
         Font labelFont = new Font("Arial", 15);
 
@@ -37,56 +45,62 @@ public class Main extends Application  {
         grid.setVgap(20);
         grid.setPadding(new Insets(25, 25, 25, 25));
 
-        Button btnReport = new Button();
-        btnReport.setText("Generate report");
-
-        Button btnInsert = new Button();
-        btnInsert.setText("Insert patient");
-
-        TextField txtName = new TextField();
+        txtName = new TextField();
         txtName.setPromptText("Name");
 
-        TextField txtPID = new TextField();
+        txtPID = new TextField();
         txtPID.setPromptText("Patient ID (ex. 1234)");
 
-        TextField txtDiagnosis = new TextField();
+        txtDiagnosis = new TextField();
         txtDiagnosis.setPromptText("Hypertension, diabetes, etc");
 
-        TextField txtPrescription = new TextField();
+        txtPrescription = new TextField();
         txtPrescription.setPromptText("Synthroid, Crestor, etc");
 
-        ChoiceBox choicePatient = new ChoiceBox();
+        choicePatient = new ChoiceBox();
         choicePatient.setItems(FXCollections.observableArrayList(
                 HospitalDBMediator.getPatients()
         ));
 
-        ChoiceBox choiceDoctor = new ChoiceBox();
+        choiceDoctor = new ChoiceBox();
         choiceDoctor.setItems(FXCollections.observableArrayList(
                 new ArrayList<String>(mDoctors.keySet())
         ));
 
-        ChoiceBox choiceRoom = new ChoiceBox();
+        choiceRoom = new ChoiceBox();
         choiceRoom.setItems(FXCollections.observableArrayList(
                 HospitalDBMediator.getRooms())
         );
 
-        Label lPID = new Label("Patient ID");
+        lPID = new Label("Patient ID");
         lPID.setFont(labelFont);
 
-        Label lPatientName = new Label("Patient name");
+        lPatientName = new Label("Patient name");
         lPatientName.setFont(labelFont);
 
-        Label lDiagnosis = new Label("Diagnosis");
+        lDiagnosis = new Label("Diagnosis");
         lDiagnosis.setFont(labelFont);
 
-        Label lPrescription = new Label("Prescription");
+        lPrescription = new Label("Prescription");
         lPrescription.setFont(labelFont);
 
-        Label lDoctor = new Label("Doctor");
+        lDoctor = new Label("Doctor");
         lDoctor.setFont(labelFont);
 
-        Label lRoom = new Label("Room");
+        lRoom = new Label("Room");
         lRoom.setFont(labelFont);
+
+        btnReport = new Button();
+        btnReport.setText("Generate report");
+
+        btnInsert = new Button();
+        btnInsert.setText("Insert patient");
+        btnInsert.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                insertPatient();
+            }
+        });
 
         // Add controls to grid
         grid.add(btnReport, 0, 0);
@@ -112,5 +126,28 @@ public class Main extends Application  {
 
         primaryStage.setScene(scene);
         primaryStage.show();
+    }
+
+    private void insertPatient() {
+        int pid, doctor, room;
+        String patientName, diagnosis, prescription;
+        try {
+            pid = Integer.parseInt(txtPID.getText());
+            patientName = txtName.getText();
+            diagnosis = txtDiagnosis.getText();
+            prescription = txtPrescription.getText();
+
+            doctor = mDoctors.get(Utils.getStringSelection(choiceDoctor));
+            room = Utils.getRoomNumber(Utils.getStringSelection(choiceRoom));
+
+            if(patientName.isEmpty() || diagnosis.isEmpty() || prescription.isEmpty()) {
+                throw new Exception("Input string empty");
+            }
+
+//            HospitalDBMediator.storePatient(pid, patientName, diagnosis,
+//                    prescription, doctor, room);
+        } catch (Exception e) {
+            System.out.println("Error: " + e.getMessage());
+        }
     }
 }
