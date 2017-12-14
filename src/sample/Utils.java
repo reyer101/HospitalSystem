@@ -1,5 +1,6 @@
 package sample;
 
+import javafx.scene.control.Alert;
 import javafx.scene.control.ChoiceBox;
 
 import java.io.BufferedWriter;
@@ -57,5 +58,23 @@ public class Utils {
         } catch(IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
+    }
+
+    public static void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error Inserting Patient");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        alert.showAndWait();
+    }
+
+    public static void showMessage(String message) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Success");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+
+        alert.showAndWait();
     }
 }

@@ -152,8 +152,8 @@ public class Main extends Application  {
                 throw new Exception("Input string empty");
             }
 
-//            HospitalDBMediator.storePatient(pid, patientName, diagnosis,
-//                    prescription, doctor, room);
+            HospitalDBMediator.storePatient(pid, patientName, diagnosis,
+                    prescription, doctor, room);
         } catch (Exception e) {
             System.out.println("Error: " + e.getMessage());
         }

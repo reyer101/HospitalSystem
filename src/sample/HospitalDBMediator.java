@@ -3,16 +3,18 @@ package sample;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Random;
 
 public class HospitalDBMediator {
     private static final String CONNECTION_URL = "jdbc:mysql://localhost/" +
             "hospital_schema?user=admin&password=password";
-    private static final String QUERY_DOCTORS = "SELECT * FROM Doctors;";
-    private static final String QUERY_ROOMS = "SELECT * FROM Rooms;";
-    private static final String QUERY_PATIENTS = "SELECT * FROM Patients;";
-    private static final String QUERY_PATIENT = "SELECT * FROM PATIENTS WHERE pid = ?";
-    private static final String INSERT_PATIENTS = "insertPatients(?, ?, ?, ?, ?, ?)";
+    private static final String QUERY_DOCTORS = "CALL get_doctors()";
+    private static final String QUERY_ROOMS = "CALL get_rooms();";
+    private static final String QUERY_PATIENTS = "CALL get_patients()";
+    private static final String QUERY_PATIENT = "CALL get_patient_by_id(?)";
+    private static final String INSERT_DIAGNOSIS = "CALL add_diagnoses(?);";
+    private static final String INSERT_PRESCRIPTION = "CALL add_prescription(?);";
+    private static final String INSERT_PATIENTS = "CALL add_patient(?, ?, ?, ?, ?, ?)";
+    private static final String GET_NEXT_ID = "{ ? = call autoDiagID()}";
 
     public static HashMap<String, Integer> getPatients() {
         HashMap<String, Integer> retval = new HashMap<>();
@@ -106,21 +108,29 @@ public class HospitalDBMediator {
 
         Connection conn = null;
 
-        // Insert prescription and diagnosis into database first..
-        // Use randomly generated ID's
-
-        Random rand = new Random();
-        int randID = rand.nextInt(999) + 1;
-
         try {
             conn =  DriverManager.getConnection(CONNECTION_URL);
             conn.setAutoCommit(false);
 
-            PreparedStatement preparedStatement = conn.prepareStatement(INSERT_PATIENTS);
+            CallableStatement dStat = conn.prepareCall(GET_NEXT_ID);
+            dStat.registerOutParameter(1, Types.INTEGER);
+            dStat.execute();
+
+            int nextID = dStat.getInt(1);
+
+            PreparedStatement preparedStatement = conn.prepareStatement(INSERT_DIAGNOSIS);
+            preparedStatement.setString(1, diagnosis);
+            preparedStatement.execute();
+
+            preparedStatement = conn.prepareStatement(INSERT_PRESCRIPTION);
+            preparedStatement.setString(1, prescription);
+            preparedStatement.execute();
+
+            preparedStatement = conn.prepareStatement(INSERT_PATIENTS);
             preparedStatement.setInt(1, pid);
             preparedStatement.setString(2, name);
-            preparedStatement.setInt(3, randID);
-            preparedStatement.setInt(4, randID);
+            preparedStatement.setInt(3, nextID);
+            preparedStatement.setInt(4, nextID);
             preparedStatement.setInt(5, doctor);
             preparedStatement.setInt(6, room);
             preparedStatement.execute();
@@ -131,7 +141,14 @@ public class HospitalDBMediator {
             System.out.println("SQLException: " + ex.getMessage());
             System.out.println("SQLState: " + ex.getSQLState());
             System.out.println("VendorError: " + ex.getErrorCode());
+
+            if(ex.getErrorCode() == 1062) {
+                Utils.showError("A patient with that pid already exists...");
+            }
+            return;
         }
+
+        Utils.showMessage("Patient inserted successfully");
     }
 
     public static HashMap<String, String> getPatientHistory(int pid) {
