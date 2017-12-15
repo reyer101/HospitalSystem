@@ -57,12 +57,15 @@ public class Utils {
             writer.close();
         } catch(IOException e) {
             System.out.println("Error: " + e.getMessage());
+            return;
         }
+        showMessage(String.format("Report for %s generated successfully: %s",
+                patientHistory.get("name"), filename));
     }
 
     public static void showError(String message) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error Inserting Patient");
+        alert.setTitle("Error");
         alert.setHeaderText(null);
         alert.setContentText(message);
 

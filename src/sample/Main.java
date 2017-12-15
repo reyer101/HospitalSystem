@@ -100,7 +100,7 @@ public class Main extends Application  {
                 if(!patient.isEmpty()) {
                     Utils.generatePatientReport(mPatients.get(patient));
                 } else {
-                    // TODO: Do something when generate report clicked and no patient
+                    Utils.showError("No patient selected");
                     System.out.println("No patient selected");
                 }
             }
@@ -154,7 +154,14 @@ public class Main extends Application  {
 
             HospitalDBMediator.storePatient(pid, patientName, diagnosis,
                     prescription, doctor, room);
+
+            // Refreshes patient list after one is added
+            mPatients = HospitalDBMediator.getPatients();
+            choicePatient.setItems(FXCollections.observableArrayList(
+                    new ArrayList<String>(mPatients.keySet())
+            ));
         } catch (Exception e) {
+            Utils.showError("Missing patient info");
             System.out.println("Error: " + e.getMessage());
         }
     }

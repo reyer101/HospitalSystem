@@ -15,6 +15,8 @@ public class HospitalDBMediator {
     private static final String INSERT_PRESCRIPTION = "CALL add_prescription(?);";
     private static final String INSERT_PATIENTS = "CALL add_patient(?, ?, ?, ?, ?, ?)";
     private static final String GET_NEXT_ID = "{ ? = call autoDiagID()}";
+    private static final String GET_DIAGNOSIS = "CALL get_diag_by_id(?)";
+    private static final String GET_PRESCRIPTION = "CALL get_presc_by_id(?)";
 
     public static HashMap<String, Integer> getPatients() {
         HashMap<String, Integer> retval = new HashMap<>();
@@ -154,6 +156,9 @@ public class HospitalDBMediator {
     public static HashMap<String, String> getPatientHistory(int pid) {
         HashMap<String, String> retval = new HashMap<>();
         Connection conn = null;
+        int diagID = 0, prescID = 0, doctorID = 0, room = 0;
+
+        String pDesc = "", dDesc = "";
 
         try {
             conn =  DriverManager.getConnection(CONNECTION_URL);
@@ -163,17 +168,40 @@ public class HospitalDBMediator {
             preparedStatement.setInt(1, pid);
             ResultSet result = preparedStatement.executeQuery();
 
-            conn.commit();
+            //conn.commit();
 
             while(result.next())
             {
-                retval.put("pid", Integer.toString(result.getInt(1)));
                 retval.put("name", result.getString(2));
-                retval.put("diagnosis", Integer.toString(result.getInt(3)));
-                retval.put("prescription", Integer.toString(result.getInt(4)));
+                diagID = result.getInt(3);
+                prescID = result.getInt(4);
                 retval.put("doctor", Integer.toString(result.getInt(5)));
                 retval.put("room", Integer.toString(result.getInt(6)));
             }
+
+            preparedStatement = conn.prepareStatement(GET_DIAGNOSIS);
+            preparedStatement.setInt(1, diagID);
+            result = preparedStatement.executeQuery();
+
+            while(result.next())
+            {
+                dDesc = result.getString(1);
+            }
+
+            preparedStatement = conn.prepareStatement(GET_PRESCRIPTION);
+            preparedStatement.setInt(1, prescID);
+            result = preparedStatement.executeQuery();
+
+            while(result.next())
+            {
+                pDesc = result.getString(1);
+            }
+
+            retval.put("pid", Integer.toString(pid));
+            retval.put("diagnosis", dDesc);
+            retval.put("prescription", pDesc);
+
+            conn.commit();
 
         } catch (SQLException ex) {
             System.out.println("SQLException: " + ex.getMessage());
